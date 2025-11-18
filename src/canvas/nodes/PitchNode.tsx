@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { Handle, Position, NodeProps } from 'reactflow';
+import { Handle, Position, NodeProps, NodeResizer } from 'reactflow';
 import { PitchNodeData } from '@/types';
 import { useStore } from '@/state/store';
 import { copyToClipboard } from '@/lib/utils';
 import { AddNodeButton } from './AddNodeButton';
+import { useRightSidebar } from '../RightSidebarContext';
 import './NodeBase.css';
 
-export const PitchNode: React.FC<NodeProps<PitchNodeData>> = ({ id, data }) => {
+export const PitchNode: React.FC<NodeProps<PitchNodeData>> = ({ id, data, selected }) => {
   const { updateNode, deleteNode, generatePitch } = useStore();
+  const { openRightSidebar } = useRightSidebar();
   const [isGenerating, setIsGenerating] = useState(false);
 
   const handleGenerate = async () => {
@@ -28,8 +30,18 @@ export const PitchNode: React.FC<NodeProps<PitchNodeData>> = ({ id, data }) => {
     }
   };
 
+  const handleResize = (_event: any, params: { width: number; height: number }) => {
+    updateNode(id, { width: params.width, height: params.height });
+  };
+
   return (
-    <div className="custom-node" style={{ width: 420 }}>
+    <div className="custom-node" style={{ width: data.width || 420, height: data.height || 'auto' }}>
+      <NodeResizer
+        isVisible={selected}
+        minWidth={250}
+        minHeight={150}
+        onResize={handleResize}
+      />
       <button
         className="delete-button"
         onClick={() => deleteNode(id)}
@@ -72,6 +84,12 @@ export const PitchNode: React.FC<NodeProps<PitchNodeData>> = ({ id, data }) => {
             <div className="node-actions">
               <button onClick={handleCopy} className="small">
                 Copy Pitch
+              </button>
+              <button
+                onClick={() => openRightSidebar(id, data.pitch)}
+                className="small"
+              >
+                View Complete
               </button>
               <button
                 onClick={handleGenerate}

@@ -17,7 +17,7 @@ import {
   loadCurrentBoardId,
   saveCurrentBoardId,
 } from '@/lib/storage';
-import { generateText, generateImages, buildContextFromText } from '@/lib/api/openrouter';
+import { generateText, generateImagePrompt, generateImages, buildContextFromText } from '@/lib/api/openrouter';
 import { generateId, getInputNodes, getNodeText } from '@/lib/utils';
 import { SYSTEM_PROMPTS } from '@/lib/constants';
 
@@ -358,7 +358,7 @@ export const useStore = create<StoreState>((set, get) => ({
             },
           ];
 
-          prompt = await generateText(config, messages);
+          prompt = await generateImagePrompt(config, messages);
           updateNode(imagesNodeId, { prompt });
         } catch (error) {
           const errorMessage =

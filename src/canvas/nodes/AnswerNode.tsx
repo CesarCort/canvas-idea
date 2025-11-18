@@ -1,13 +1,15 @@
 import React from 'react';
-import { Handle, Position, NodeProps } from 'reactflow';
+import { Handle, Position, NodeProps, NodeResizer } from 'reactflow';
 import { AnswerNodeData } from '@/types';
 import { useStore } from '@/state/store';
 import { copyToClipboard } from '@/lib/utils';
 import { AddNodeButton } from './AddNodeButton';
+import { useRightSidebar } from '../RightSidebarContext';
 import './NodeBase.css';
 
-export const AnswerNode: React.FC<NodeProps<AnswerNodeData>> = ({ id, data }) => {
-  const { deleteNode } = useStore();
+export const AnswerNode: React.FC<NodeProps<AnswerNodeData>> = ({ id, data, selected }) => {
+  const { updateNode, deleteNode } = useStore();
+  const { openRightSidebar } = useRightSidebar();
 
   const handleCopy = async () => {
     const success = await copyToClipboard(data.answer);
@@ -16,8 +18,18 @@ export const AnswerNode: React.FC<NodeProps<AnswerNodeData>> = ({ id, data }) =>
     }
   };
 
+  const handleResize = (_event: any, params: { width: number; height: number }) => {
+    updateNode(id, { width: params.width, height: params.height });
+  };
+
   return (
-    <div className="custom-node" style={{ width: 400 }}>
+    <div className="custom-node" style={{ width: data.width || 400, height: data.height || 'auto' }}>
+      <NodeResizer
+        isVisible={selected}
+        minWidth={250}
+        minHeight={150}
+        onResize={handleResize}
+      />
       <button
         className="delete-button"
         onClick={() => deleteNode(id)}
@@ -47,6 +59,12 @@ export const AnswerNode: React.FC<NodeProps<AnswerNodeData>> = ({ id, data }) =>
             <div className="node-actions">
               <button onClick={handleCopy} className="small">
                 Copy Answer
+              </button>
+              <button
+                onClick={() => openRightSidebar(id, data.answer)}
+                className="small"
+              >
+                View Complete
               </button>
             </div>
           </>

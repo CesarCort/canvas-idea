@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Handle, Position, NodeProps } from 'reactflow';
+import { Handle, Position, NodeProps, NodeResizer } from 'reactflow';
 import { QuestionNodeData } from '@/types';
 import { useStore } from '@/state/store';
 import { AddNodeButton } from './AddNodeButton';
 import './NodeBase.css';
 
-export const QuestionNode: React.FC<NodeProps<QuestionNodeData>> = ({ id, data }) => {
+export const QuestionNode: React.FC<NodeProps<QuestionNodeData>> = ({ id, data, selected }) => {
   const { updateNode, deleteNode, generateAnswer } = useStore();
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -22,8 +22,18 @@ export const QuestionNode: React.FC<NodeProps<QuestionNodeData>> = ({ id, data }
     }
   };
 
+  const handleResize = (_event: any, params: { width: number; height: number }) => {
+    updateNode(id, { width: params.width, height: params.height });
+  };
+
   return (
-    <div className="custom-node" style={{ width: 350 }}>
+    <div className="custom-node" style={{ width: data.width || 350, height: data.height || 'auto' }}>
+      <NodeResizer
+        isVisible={selected}
+        minWidth={250}
+        minHeight={150}
+        onResize={handleResize}
+      />
       <button
         className="delete-button"
         onClick={() => deleteNode(id)}

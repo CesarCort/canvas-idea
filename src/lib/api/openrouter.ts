@@ -21,7 +21,7 @@ export async function generateText(
     model: config.textModel,
     messages,
     temperature: config.temperature,
-    max_tokens: config.maxTokens,
+    max_tokens: config.maxTokensText,
   };
 
   try {
@@ -55,6 +55,59 @@ export async function generateText(
       throw error;
     }
     throw new Error('Unknown error occurred while generating text');
+  }
+}
+
+/**
+ * Generates text for image prompts using the configured model via OpenRouter
+ * Uses maxTokensImage from config
+ */
+export async function generateImagePrompt(
+  config: AppConfig,
+  messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }>
+): Promise<string> {
+  if (!config.apiKey) {
+    throw new Error('API key not configured. Please add your API key in Settings.');
+  }
+
+  const request: TextGenerationRequest = {
+    model: config.textModel,
+    messages,
+    temperature: config.temperature,
+    max_tokens: config.maxTokensImage,
+  };
+
+  try {
+    const response = await fetch(`${config.apiBaseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${config.apiKey}`,
+        'HTTP-Referer': window.location.origin,
+        'X-Title': 'Canvas IA',
+      },
+      body: JSON.stringify(request),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.error?.message || `API request failed: ${response.statusText}`
+      );
+    }
+
+    const data: TextGenerationResponse = await response.json();
+
+    if (!data.choices || data.choices.length === 0) {
+      throw new Error('No response generated from the API');
+    }
+
+    return data.choices[0].message.content;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error('Unknown error occurred while generating image prompt');
   }
 }
 

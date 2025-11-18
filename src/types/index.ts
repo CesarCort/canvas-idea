@@ -18,6 +18,9 @@ export interface BaseNodeData {
   label: string;
   status: NodeStatus;
   errorMessage?: string;
+  width?: number;
+  height?: number;
+  notes?: string;
 }
 
 // Text Source Node Data
@@ -86,7 +89,8 @@ export interface AppConfig {
   textModel: string;
   imageModel: string;
   temperature: number;
-  maxTokens?: number;
+  maxTokensText?: number;
+  maxTokensImage?: number;
   apiBaseUrl: string;
 }
 

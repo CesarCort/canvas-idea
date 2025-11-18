@@ -59,7 +59,8 @@ export const DEFAULT_CONFIG: AppConfig = {
   textModel: 'openai/gpt-3.5-turbo',
   imageModel: 'openai/dall-e-2',
   temperature: 0.7,
-  maxTokens: 2000,
+  maxTokensText: 2000,
+  maxTokensImage: 1000,
   apiBaseUrl: 'https://openrouter.ai/api/v1',
 };
 

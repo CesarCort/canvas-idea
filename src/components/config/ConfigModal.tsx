@@ -111,22 +111,42 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({ isOpen, onClose }) => 
           </div>
 
           <div className="form-group">
-            <label htmlFor="maxTokens">Max Tokens (optional)</label>
+            <label htmlFor="maxTokensText">Max Tokens for Text (optional)</label>
             <input
-              id="maxTokens"
+              id="maxTokensText"
               type="number"
               min="100"
               max="8000"
-              value={config.maxTokens || ''}
+              value={config.maxTokensText || ''}
               onChange={(e) =>
                 updateConfig({
-                  maxTokens: e.target.value ? parseInt(e.target.value) : undefined,
+                  maxTokensText: e.target.value ? parseInt(e.target.value) : undefined,
                 })
               }
               placeholder="2000"
             />
             <p className="help-text">
-              Maximum length of generated responses.
+              Maximum length of generated text responses.
+            </p>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="maxTokensImage">Max Tokens for Images (optional)</label>
+            <input
+              id="maxTokensImage"
+              type="number"
+              min="100"
+              max="8000"
+              value={config.maxTokensImage || ''}
+              onChange={(e) =>
+                updateConfig({
+                  maxTokensImage: e.target.value ? parseInt(e.target.value) : undefined,
+                })
+              }
+              placeholder="1000"
+            />
+            <p className="help-text">
+              Maximum tokens for image prompt generation.
             </p>
           </div>
 

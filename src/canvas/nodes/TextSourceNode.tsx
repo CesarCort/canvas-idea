@@ -1,12 +1,12 @@
 import React from 'react';
-import { Handle, Position, NodeProps } from 'reactflow';
+import { Handle, Position, NodeProps, NodeResizer } from 'reactflow';
 import { TextSourceNodeData } from '@/types';
 import { useStore } from '@/state/store';
 import { copyToClipboard } from '@/lib/utils';
 import { AddNodeButton } from './AddNodeButton';
 import './NodeBase.css';
 
-export const TextSourceNode: React.FC<NodeProps<TextSourceNodeData>> = ({ id, data }) => {
+export const TextSourceNode: React.FC<NodeProps<TextSourceNodeData>> = ({ id, data, selected }) => {
   const { updateNode, deleteNode } = useStore();
 
   const handleCopy = async () => {
@@ -16,8 +16,18 @@ export const TextSourceNode: React.FC<NodeProps<TextSourceNodeData>> = ({ id, da
     }
   };
 
+  const handleResize = (_event: any, params: { width: number; height: number }) => {
+    updateNode(id, { width: params.width, height: params.height });
+  };
+
   return (
-    <div className="custom-node" style={{ width: 400 }}>
+    <div className="custom-node" style={{ width: data.width || 400, height: data.height || 'auto' }}>
+      <NodeResizer
+        isVisible={selected}
+        minWidth={250}
+        minHeight={150}
+        onResize={handleResize}
+      />
       <button
         className="delete-button"
         onClick={() => deleteNode(id)}

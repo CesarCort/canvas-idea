@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import ReactFlow, {
   Background,
   Controls,
@@ -13,8 +13,11 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 
 import { useStore } from '@/state/store';
-import { NodeType } from '@/types';
-import { isValidConnection } from '@/lib/utils';
+import { NodeType, CustomNode } from '@/types';
+import { isValidConnection, generateId } from '@/lib/utils';
+import { RightSidebarContext } from './RightSidebarContext';
+import { ContextMenu } from './ContextMenu';
+import { TextBox, TextBoxData } from './TextBox';
 import {
   TextSourceNode,
   QuestionNode,
@@ -33,9 +36,17 @@ const nodeTypes: NodeTypes = {
   [NodeType.IMAGES]: ImagesNode,
 };
 
-const CanvasInner: React.FC = () => {
-  const { nodes, edges, setNodes, setEdges, addEdge: addStoreEdge } = useStore();
+interface CanvasInnerProps {
+  onOpenRightSidebar: (nodeId: string, content: string) => void;
+}
+
+const CanvasInner: React.FC<CanvasInnerProps> = ({ onOpenRightSidebar }) => {
+  const { nodes, edges, setNodes, setEdges, addEdge: addStoreEdge, addNode } = useStore();
   const reactFlow = useReactFlow();
+
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
+  const [textBoxes, setTextBoxes] = useState<TextBoxData[]>([]);
+  const [selectedTextBoxId, setSelectedTextBoxId] = useState<string | null>(null);
 
   // Watch for new nodes and fit view to show them
   useEffect(() => {
@@ -126,6 +137,62 @@ const CanvasInner: React.FC = () => {
     [nodes, addStoreEdge]
   );
 
+  const handleContextMenu = useCallback((event: React.MouseEvent) => {
+    event.preventDefault();
+    setContextMenu({ x: event.clientX, y: event.clientY });
+  }, []);
+
+  const handleCreateFromContextMenu = useCallback((type: NodeType | 'text') => {
+    if (!contextMenu) return;
+
+    const position = reactFlow.screenToFlowPosition({
+      x: contextMenu.x,
+      y: contextMenu.y,
+    });
+
+    if (type === 'text') {
+      // Create text box
+      const newTextBox: TextBoxData = {
+        id: generateId(),
+        x: contextMenu.x,
+        y: contextMenu.y,
+        content: '',
+        fontSize: 16,
+        color: '#ffffff',
+        fontWeight: 'normal',
+        fontStyle: 'normal',
+      };
+      setTextBoxes(prev => [...prev, newTextBox]);
+      setSelectedTextBoxId(newTextBox.id);
+    } else {
+      // Create node
+      const newNode: CustomNode = {
+        id: generateId(),
+        type,
+        position,
+        data: getDefaultNodeData(type),
+      };
+      addNode(newNode);
+    }
+  }, [contextMenu, reactFlow, addNode]);
+
+  const getDefaultNodeData = (type: NodeType): any => {
+    switch (type) {
+      case NodeType.TEXT_SOURCE:
+        return { label: 'Text Source', status: 'idle', text: '' };
+      case NodeType.QUESTION:
+        return { label: 'Question', status: 'idle', question: '' };
+      case NodeType.SUMMARY:
+        return { label: 'Summary', status: 'idle', summary: '', bulletCount: 5 };
+      case NodeType.PITCH:
+        return { label: 'Pitch', status: 'idle', pitch: '', pitchType: 'short' };
+      case NodeType.IMAGES:
+        return { label: 'Images', status: 'idle', prompt: '', imageCount: 1, imageUrls: [] };
+      default:
+        return { label: 'Node', status: 'idle' };
+    }
+  };
+
   const minimapNodeColor = useCallback((node: any) => {
     switch (node.type) {
       case NodeType.TEXT_SOURCE:
@@ -146,8 +213,36 @@ const CanvasInner: React.FC = () => {
   }, []);
 
   return (
-    <div style={{ width: '100%', height: '100%' }}>
-      <ReactFlow
+    <RightSidebarContext.Provider value={{ openRightSidebar: onOpenRightSidebar }}>
+      <div style={{ width: '100%', height: '100%' }} onContextMenu={handleContextMenu}>
+        {/* Text boxes */}
+        {textBoxes.map(textBox => (
+          <TextBox
+            key={textBox.id}
+            data={textBox}
+            selected={selectedTextBoxId === textBox.id}
+            onSelect={setSelectedTextBoxId}
+            onUpdate={(id, updates) => {
+              setTextBoxes(prev => prev.map(tb => tb.id === id ? { ...tb, ...updates } : tb));
+            }}
+            onDelete={(id) => {
+              setTextBoxes(prev => prev.filter(tb => tb.id !== id));
+              setSelectedTextBoxId(null);
+            }}
+          />
+        ))}
+
+        {/* Context menu */}
+        {contextMenu && (
+          <ContextMenu
+            x={contextMenu.x}
+            y={contextMenu.y}
+            onClose={() => setContextMenu(null)}
+            onCreateNode={handleCreateFromContextMenu}
+          />
+        )}
+
+        <ReactFlow
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}
@@ -172,14 +267,19 @@ const CanvasInner: React.FC = () => {
           pannable
         />
       </ReactFlow>
-    </div>
+      </div>
+    </RightSidebarContext.Provider>
   );
 };
 
-export const Canvas: React.FC = () => {
+interface CanvasProps {
+  onOpenRightSidebar: (nodeId: string, content: string) => void;
+}
+
+export const Canvas: React.FC<CanvasProps> = ({ onOpenRightSidebar }) => {
   return (
     <ReactFlowProvider>
-      <CanvasInner />
+      <CanvasInner onOpenRightSidebar={onOpenRightSidebar} />
     </ReactFlowProvider>
   );
 };
