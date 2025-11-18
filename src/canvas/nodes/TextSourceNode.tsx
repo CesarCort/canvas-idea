@@ -1,11 +1,12 @@
 import React from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
-import { TextSourceNodeData } from '@/types';
+import { TextSourceNodeData, NodeType } from '@/types';
 import { useStore } from '@/state/store';
 import { copyToClipboard } from '@/lib/utils';
+import { AddNodeButton } from './AddNodeButton';
 import './NodeBase.css';
 
-export const TextSourceNode: React.FC<NodeProps<TextSourceNodeData>> = ({ id, data }) => {
+export const TextSourceNode: React.FC<NodeProps<TextSourceNodeData>> = ({ id, data, type }) => {
   const { updateNode, deleteNode } = useStore();
 
   const handleCopy = async () => {
@@ -24,6 +25,8 @@ export const TextSourceNode: React.FC<NodeProps<TextSourceNodeData>> = ({ id, da
       >
         ✕
       </button>
+
+      <AddNodeButton sourceNodeId={id} sourceNodeType={type || NodeType.TEXT_SOURCE} />
 
       <div className="node-header">
         <h4 className="node-title">📄 Text Source</h4>

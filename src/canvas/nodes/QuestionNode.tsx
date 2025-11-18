@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
-import { QuestionNodeData } from '@/types';
+import { QuestionNodeData, NodeType } from '@/types';
 import { useStore } from '@/state/store';
+import { AddNodeButton } from './AddNodeButton';
 import './NodeBase.css';
 
-export const QuestionNode: React.FC<NodeProps<QuestionNodeData>> = ({ id, data }) => {
+export const QuestionNode: React.FC<NodeProps<QuestionNodeData>> = ({ id, data, type }) => {
   const { updateNode, deleteNode, generateAnswer } = useStore();
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -22,7 +23,7 @@ export const QuestionNode: React.FC<NodeProps<QuestionNodeData>> = ({ id, data }
   };
 
   return (
-    <div className="custom-node" style={{ width: 300 }}>
+    <div className="custom-node" style={{ width: 350 }}>
       <button
         className="delete-button"
         onClick={() => deleteNode(id)}
@@ -30,6 +31,8 @@ export const QuestionNode: React.FC<NodeProps<QuestionNodeData>> = ({ id, data }
       >
         ✕
       </button>
+
+      <AddNodeButton sourceNodeId={id} sourceNodeType={type || NodeType.QUESTION} />
 
       <Handle
         type="target"
