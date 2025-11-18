@@ -10,6 +10,7 @@ import './App.css';
 function App() {
   const [isConfigOpen, setIsConfigOpen] = useState(false);
   const [isBoardManagerOpen, setIsBoardManagerOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const { boards, currentBoardId, createBoard } = useStore();
 
   // Create a default board if none exists
@@ -27,10 +28,12 @@ function App() {
       <Header
         onOpenConfig={() => setIsConfigOpen(true)}
         onOpenBoardManager={() => setIsBoardManagerOpen(true)}
+        onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+        isSidebarOpen={isSidebarOpen}
       />
 
       <div className="app-content">
-        <Sidebar />
+        {isSidebarOpen && <Sidebar />}
         <main className="canvas-container">
           <Canvas />
         </main>

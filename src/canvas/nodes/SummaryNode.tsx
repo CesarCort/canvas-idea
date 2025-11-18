@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
-import { SummaryNodeData, NodeType } from '@/types';
+import { SummaryNodeData } from '@/types';
 import { useStore } from '@/state/store';
 import { copyToClipboard } from '@/lib/utils';
 import { AddNodeButton } from './AddNodeButton';
 import './NodeBase.css';
 
-export const SummaryNode: React.FC<NodeProps<SummaryNodeData>> = ({ id, data, type }) => {
+export const SummaryNode: React.FC<NodeProps<SummaryNodeData>> = ({ id, data }) => {
   const { updateNode, deleteNode, generateSummary } = useStore();
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -38,7 +38,7 @@ export const SummaryNode: React.FC<NodeProps<SummaryNodeData>> = ({ id, data, ty
         ✕
       </button>
 
-      <AddNodeButton sourceNodeId={id} sourceNodeType={type || NodeType.SUMMARY} />
+      <AddNodeButton sourceNodeId={id} />
 
       <Handle
         type="target"

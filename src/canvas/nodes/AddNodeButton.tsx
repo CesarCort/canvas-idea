@@ -6,7 +6,6 @@ import './NodeBase.css';
 
 interface AddNodeButtonProps {
   sourceNodeId: string;
-  sourceNodeType: string;
 }
 
 interface NodeOption {
@@ -15,41 +14,19 @@ interface NodeOption {
   icon: string;
 }
 
-export const AddNodeButton: React.FC<AddNodeButtonProps> = ({ sourceNodeId, sourceNodeType }) => {
+export const AddNodeButton: React.FC<AddNodeButtonProps> = ({ sourceNodeId }) => {
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const { addNode, addEdge, nodes } = useStore();
 
-  // Define qué tipos de nodos se pueden crear según el nodo fuente
+  // All node types are always available regardless of source
   const getAvailableNodeTypes = (): NodeOption[] => {
-    switch (sourceNodeType) {
-      case NodeType.TEXT_SOURCE:
-        return [
-          { type: NodeType.QUESTION, label: 'Question', icon: '❓' },
-          { type: NodeType.SUMMARY, label: 'Summary', icon: '📋' },
-          { type: NodeType.PITCH, label: 'Pitch', icon: '🎯' },
-          { type: NodeType.IMAGES, label: 'Images', icon: '🖼️' },
-        ];
-      case NodeType.ANSWER:
-        return [
-          { type: NodeType.SUMMARY, label: 'Summary', icon: '📋' },
-          { type: NodeType.PITCH, label: 'Pitch', icon: '🎯' },
-          { type: NodeType.QUESTION, label: 'Question', icon: '❓' },
-        ];
-      case NodeType.SUMMARY:
-        return [
-          { type: NodeType.PITCH, label: 'Pitch', icon: '🎯' },
-          { type: NodeType.IMAGES, label: 'Images', icon: '🖼️' },
-          { type: NodeType.QUESTION, label: 'Question', icon: '❓' },
-        ];
-      case NodeType.PITCH:
-        return [
-          { type: NodeType.IMAGES, label: 'Images', icon: '🖼️' },
-          { type: NodeType.QUESTION, label: 'Question', icon: '❓' },
-        ];
-      default:
-        return [];
-    }
+    return [
+      { type: NodeType.QUESTION, label: 'Question', icon: '❓' },
+      { type: NodeType.SUMMARY, label: 'Summary', icon: '📋' },
+      { type: NodeType.PITCH, label: 'Pitch', icon: '🎯' },
+      { type: NodeType.IMAGES, label: 'Images', icon: '🖼️' },
+    ];
   };
 
   const availableNodes = getAvailableNodeTypes();

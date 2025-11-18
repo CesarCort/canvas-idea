@@ -105,6 +105,17 @@
   min-height: 100px;
   resize: vertical;
   line-height: 1.6;
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  cursor: text;
+}
+
+.node-field input {
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  cursor: text;
 }
 
 .node-actions {
@@ -130,6 +141,10 @@
   word-wrap: break-word;
   font-size: 0.875rem;
   line-height: 1.5;
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  cursor: text;
 }
 
 .node-error {

@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import ReactFlow, {
   Background,
   Controls,
@@ -7,6 +7,8 @@ import ReactFlow, {
   Edge,
   NodeTypes,
   ConnectionMode,
+  useReactFlow,
+  ReactFlowProvider,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
@@ -31,8 +33,26 @@ const nodeTypes: NodeTypes = {
   [NodeType.IMAGES]: ImagesNode,
 };
 
-export const Canvas: React.FC = () => {
+const CanvasInner: React.FC = () => {
   const { nodes, edges, setNodes, setEdges, addEdge: addStoreEdge } = useStore();
+  const reactFlow = useReactFlow();
+
+  // Watch for new nodes and fit view to show them
+  useEffect(() => {
+    if (nodes.length > 0) {
+      const lastNode = nodes[nodes.length - 1];
+      // If the last node is an Answer node, fit view to show it
+      if (lastNode.type === NodeType.ANSWER) {
+        setTimeout(() => {
+          reactFlow.fitView({
+            padding: 0.2,
+            duration: 500,
+            nodes: [lastNode],
+          });
+        }, 100);
+      }
+    }
+  }, [nodes.length, reactFlow]);
 
   const onNodesChange = useCallback(
     (changes: any) => {
@@ -138,6 +158,10 @@ export const Canvas: React.FC = () => {
         fitView
         minZoom={0.2}
         maxZoom={2}
+        nodesDraggable={true}
+        nodesConnectable={true}
+        elementsSelectable={true}
+        selectNodesOnDrag={false}
       >
         <Background color="#333" gap={16} />
         <Controls />
@@ -149,5 +173,13 @@ export const Canvas: React.FC = () => {
         />
       </ReactFlow>
     </div>
+  );
+};
+
+export const Canvas: React.FC = () => {
+  return (
+    <ReactFlowProvider>
+      <CanvasInner />
+    </ReactFlowProvider>
   );
 };

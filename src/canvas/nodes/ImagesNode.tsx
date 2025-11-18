@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
-import { ImagesNodeData, NodeType } from '@/types';
+import { ImagesNodeData } from '@/types';
 import { useStore } from '@/state/store';
 import { AddNodeButton } from './AddNodeButton';
 import './NodeBase.css';
 
-export const ImagesNode: React.FC<NodeProps<ImagesNodeData>> = ({ id, data, type }) => {
+export const ImagesNode: React.FC<NodeProps<ImagesNodeData>> = ({ id, data }) => {
   const { updateNode, deleteNode, generateImages } = useStore();
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -32,7 +32,7 @@ export const ImagesNode: React.FC<NodeProps<ImagesNodeData>> = ({ id, data, type
           ✕
         </button>
 
-        <AddNodeButton sourceNodeId={id} sourceNodeType={type || NodeType.IMAGES} />
+        <AddNodeButton sourceNodeId={id} />
 
         <Handle
           type="target"

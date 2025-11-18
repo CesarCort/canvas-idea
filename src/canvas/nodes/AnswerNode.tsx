@@ -1,12 +1,12 @@
 import React from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
-import { AnswerNodeData, NodeType } from '@/types';
+import { AnswerNodeData } from '@/types';
 import { useStore } from '@/state/store';
 import { copyToClipboard } from '@/lib/utils';
 import { AddNodeButton } from './AddNodeButton';
 import './NodeBase.css';
 
-export const AnswerNode: React.FC<NodeProps<AnswerNodeData>> = ({ id, data, type }) => {
+export const AnswerNode: React.FC<NodeProps<AnswerNodeData>> = ({ id, data }) => {
   const { deleteNode } = useStore();
 
   const handleCopy = async () => {
@@ -26,7 +26,7 @@ export const AnswerNode: React.FC<NodeProps<AnswerNodeData>> = ({ id, data, type
         ✕
       </button>
 
-      <AddNodeButton sourceNodeId={id} sourceNodeType={type || NodeType.ANSWER} />
+      <AddNodeButton sourceNodeId={id} />
 
       <Handle
         type="target"

@@ -5,9 +5,11 @@ import './Header.css';
 interface HeaderProps {
   onOpenConfig: () => void;
   onOpenBoardManager: () => void;
+  onToggleSidebar: () => void;
+  isSidebarOpen: boolean;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onOpenConfig, onOpenBoardManager }) => {
+export const Header: React.FC<HeaderProps> = ({ onOpenConfig, onOpenBoardManager, onToggleSidebar, isSidebarOpen }) => {
   const { boards, currentBoardId, createBoard, saveBoard } = useStore();
   const [isCreatingBoard, setIsCreatingBoard] = useState(false);
   const [newBoardName, setNewBoardName] = useState('');
@@ -30,6 +32,13 @@ export const Header: React.FC<HeaderProps> = ({ onOpenConfig, onOpenBoardManager
   return (
     <header className="header">
       <div className="header-left">
+        <button
+          onClick={onToggleSidebar}
+          className="sidebar-toggle"
+          title={isSidebarOpen ? "Hide sidebar" : "Show sidebar"}
+        >
+          {isSidebarOpen ? '◀' : '▶'}
+        </button>
         <h1 className="header-title">Canvas IA</h1>
         {currentBoard && (
           <span className="board-name">{currentBoard.name}</span>

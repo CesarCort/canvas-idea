@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
-import { PitchNodeData, NodeType } from '@/types';
+import { PitchNodeData } from '@/types';
 import { useStore } from '@/state/store';
 import { copyToClipboard } from '@/lib/utils';
 import { AddNodeButton } from './AddNodeButton';
 import './NodeBase.css';
 
-export const PitchNode: React.FC<NodeProps<PitchNodeData>> = ({ id, data, type }) => {
+export const PitchNode: React.FC<NodeProps<PitchNodeData>> = ({ id, data }) => {
   const { updateNode, deleteNode, generatePitch } = useStore();
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -38,7 +38,7 @@ export const PitchNode: React.FC<NodeProps<PitchNodeData>> = ({ id, data, type }
         ✕
       </button>
 
-      <AddNodeButton sourceNodeId={id} sourceNodeType={type || NodeType.PITCH} />
+      <AddNodeButton sourceNodeId={id} />
 
       <Handle
         type="target"
