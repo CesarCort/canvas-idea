@@ -1,0 +1,107 @@
+import React, { useState } from 'react';
+import { Handle, Position, NodeProps } from 'reactflow';
+import { PitchNodeData } from '@/types';
+import { useStore } from '@/state/store';
+import { copyToClipboard } from '@/lib/utils';
+import './NodeBase.css';
+
+export const PitchNode: React.FC<NodeProps<PitchNodeData>> = ({ id, data }) => {
+  const { updateNode, deleteNode, generatePitch } = useStore();
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const handleGenerate = async () => {
+    try {
+      setIsGenerating(true);
+      await generatePitch(id);
+    } catch (error) {
+      console.error('Error generating pitch:', error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleCopy = async () => {
+    const success = await copyToClipboard(data.pitch);
+    if (success) {
+      // Could show a toast notification here
+    }
+  };
+
+  return (
+    <div className="custom-node" style={{ width: 400 }}>
+      <button
+        className="delete-button"
+        onClick={() => deleteNode(id)}
+        title="Delete node"
+      >
+        ✕
+      </button>
+
+      <Handle
+        type="target"
+        position={Position.Left}
+        id="input"
+        style={{ background: 'var(--accent-primary)' }}
+      />
+
+      <div className="node-header">
+        <h4 className="node-title">🎯 Pitch</h4>
+        <span className={`node-status ${data.status}`}>{data.status}</span>
+      </div>
+
+      <div className="node-body">
+        <div className="node-field">
+          <label>Pitch Type</label>
+          <select
+            value={data.pitchType}
+            onChange={(e) =>
+              updateNode(id, { pitchType: e.target.value as 'short' | 'detailed' })
+            }
+          >
+            <option value="short">Short (1 min)</option>
+            <option value="detailed">Detailed (3 min)</option>
+          </select>
+        </div>
+
+        {data.pitch ? (
+          <>
+            <div className="node-content">{data.pitch}</div>
+            <div className="node-actions">
+              <button onClick={handleCopy} className="small">
+                Copy Pitch
+              </button>
+              <button
+                onClick={handleGenerate}
+                disabled={isGenerating}
+                className="small"
+              >
+                Regenerate
+              </button>
+            </div>
+          </>
+        ) : (
+          <div className="node-actions">
+            <button
+              onClick={handleGenerate}
+              disabled={isGenerating}
+              className="primary"
+            >
+              {isGenerating ? 'Generating...' : 'Generate Pitch'}
+            </button>
+          </div>
+        )}
+
+        {data.errorMessage && (
+          <div className="node-error">{data.errorMessage}</div>
+        )}
+      </div>
+
+      <Handle
+        type="source"
+        position={Position.Right}
+        id="output"
+        style={{ background: 'var(--accent-primary)' }}
+      />
+    </div>
+  );
+};
